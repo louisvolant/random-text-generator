@@ -1,101 +1,103 @@
-import Image from "next/image";
+// src/app/page.tsx
+"use client";
 
-export default function Home() {
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import Head from 'next/head';
+
+interface TextData {
+  title?: string;
+  content?: string;
+  book?: string;
+  author?: string;
+  // Add other properties as needed
+}
+
+function HomePage() {
+  const [currentText, setCurrentText] = useState<TextData>({});
+  const [language, setLanguage] = useState('en');
+
+  useEffect(() => {
+    fetchTexts(language);
+  }, [language]);
+
+const fetchTexts = async (lang: string) => {
+  try {
+    const response = await fetch(`/api/text/${lang}`); // Updated URL
+
+      const files = await response.json();
+      console.log('Available files:', files);
+      if (files.length > 0) {
+        const randomFile = files[Math.floor(Math.random() * files.length)];
+        const fileContent = await fetch(`/texts/${lang}/${randomFile}`);
+        const data = await fileContent.json();
+        setCurrentText(data);
+      } else {
+        console.log("No texts available for this language.");
+        setCurrentText({});
+      }
+    } catch (error) {
+      console.error("Failed to fetch texts:", error); // Keep the error handling
+    }
+  };
+
+  const handleLanguageChange = (lang: string) => {
+    setLanguage(lang);
+    fetchTexts(lang);
+  };
+
+  const copyToClipboard = () => {
+    if (currentText.content) {
+      navigator.clipboard.writeText(currentText.content);
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <>
+      {/* Favicon and meta tags */}
+      <Head>
+        <title>Public Domain Texts</title>
+        <link rel="icon" href="/icon.png" />
+      </Head>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <div className="flex flex-col justify-start items-center min-h-screen px-4 py-8">
+        <div className="max-w-2xl w-full">
+          <h1 className="text-2xl font-bold flex items-center">
+          <Image src="/icon.png" alt="Logo" width={32} height={32} className="w-8 h-8 mr-2" />
+            Public-Domain Text Examples
+          </h1>
+
+          <div className="my-4">
+            {['en', 'es', 'fr', 'de', 'it', 'pt'].map((lang) => (
+              <button
+                key={lang}
+                onClick={() => handleLanguageChange(lang)}
+                className={`px-4 py-2 m-1 rounded ${language === lang ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+              >
+                {lang.toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          <div className="max-w-full p-4 border rounded-lg bg-gray-100 shadow-lg">
+            {currentText?.title && <h2 className="text-lg font-semibold">{currentText.title}</h2>}
+            {currentText?.book && <p className="italic">From: {currentText.book}</p>}
+            {currentText?.author && <p className="font-medium">By: {currentText.author}</p>}
+            <p className="mt-4 whitespace-pre-line">{currentText.content}</p>
+
+            <div className="flex justify-between mt-4">
+              <button onClick={copyToClipboard} className="px-4 py-2 bg-gray-300 rounded text-sm">
+                Copy Text
+              </button>
+              <button onClick={() => fetchTexts(language)} className="px-4 py-2 bg-blue-300 rounded text-sm">
+                New Excerpt
+              </button>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </>
   );
 }
+
+export default HomePage;
