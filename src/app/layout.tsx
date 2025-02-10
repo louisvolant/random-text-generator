@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Public-Domain Text Examples",
-  description: "Public-Domain book excerpts & summaries for your devs text.",
+  description: "Public-Domain book excerpts & summaries for your devs text, to change a bit from the classical Lorem Ipsum.",
   icons: {
     icon: "/icon.png",
   },
