@@ -10,7 +10,6 @@ interface TextData {
   content?: string;
   book?: string;
   author?: string;
-  // Add other properties as needed
 }
 
 function HomePage() {
@@ -21,10 +20,9 @@ function HomePage() {
     fetchTexts(language);
   }, [language]);
 
-const fetchTexts = async (lang: string) => {
-  try {
-    const response = await fetch(`/api/text/${lang}`); // Updated URL
-
+  const fetchTexts = async (lang: string) => {
+    try {
+      const response = await fetch(`/api/text/${lang}`);
       const files = await response.json();
       console.log('Available files:', files);
       if (files.length > 0) {
@@ -37,7 +35,7 @@ const fetchTexts = async (lang: string) => {
         setCurrentText({});
       }
     } catch (error) {
-      console.error("Failed to fetch texts:", error); // Keep the error handling
+      console.error("Failed to fetch texts:", error);
     }
   };
 
@@ -54,7 +52,6 @@ const fetchTexts = async (lang: string) => {
 
   return (
     <>
-      {/* Favicon and meta tags */}
       <Head>
         <title>Public Domain Texts</title>
         <link rel="icon" href="/icon.png" />
@@ -62,8 +59,8 @@ const fetchTexts = async (lang: string) => {
 
       <div className="flex flex-col justify-start items-center min-h-screen px-4 py-8">
         <div className="max-w-2xl w-full">
-          <h1 className="text-2xl font-bold flex items-center">
-          <Image src="/icon.png" alt="Logo" width={32} height={32} className="w-8 h-8 mr-2" />
+          <h1 className="text-2xl font-bold flex items-center text-gray-900 dark:text-gray-100">
+            <Image src="/icon.png" alt="Logo" width={32} height={32} className="w-8 h-8 mr-2" />
             Public-Domain Text Examples
           </h1>
 
@@ -72,24 +69,40 @@ const fetchTexts = async (lang: string) => {
               <button
                 key={lang}
                 onClick={() => handleLanguageChange(lang)}
-                className={`px-4 py-2 m-1 rounded ${language === lang ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                className={`px-4 py-2 m-1 rounded ${
+                  language === lang
+                    ? 'bg-blue-500 text-white dark:bg-blue-600'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-300'
+                } hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors`}
               >
                 {lang.toUpperCase()}
               </button>
             ))}
           </div>
 
-          <div className="max-w-full p-4 border rounded-lg bg-gray-100 shadow-lg">
-            {currentText?.title && <h2 className="text-lg font-semibold">{currentText.title}</h2>}
-            {currentText?.book && <p className="italic">From: {currentText.book}</p>}
-            {currentText?.author && <p className="font-medium">By: {currentText.author}</p>}
-            <p className="mt-4 whitespace-pre-line">{currentText.content}</p>
+          <div className="max-w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-800 shadow-lg">
+            {currentText?.title && (
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{currentText.title}</h2>
+            )}
+            {currentText?.book && (
+              <p className="italic text-gray-700 dark:text-gray-300">From: {currentText.book}</p>
+            )}
+            {currentText?.author && (
+              <p className="font-medium text-gray-800 dark:text-gray-200">By: {currentText.author}</p>
+            )}
+            <p className="mt-4 whitespace-pre-line text-gray-900 dark:text-gray-100">{currentText.content}</p>
 
             <div className="flex justify-between mt-4">
-              <button onClick={copyToClipboard} className="px-4 py-2 bg-gray-300 rounded text-sm">
+              <button
+                onClick={copyToClipboard}
+                className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded text-sm text-gray-900 dark:text-gray-100 hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+              >
                 Copy Text
               </button>
-              <button onClick={() => fetchTexts(language)} className="px-4 py-2 bg-blue-300 rounded text-sm">
+              <button
+                onClick={() => fetchTexts(language)}
+                className="px-4 py-2 bg-blue-300 dark:bg-blue-500 rounded text-sm text-gray-900 dark:text-white hover:bg-blue-400 dark:hover:bg-blue-600 transition-colors"
+              >
                 New Excerpt
               </button>
             </div>
